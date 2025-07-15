@@ -1,0 +1,13 @@
+train: /Users/antonyjacob/Desktop/ChessSet/ChessSet Label.v4i.yolov5pytorch/train/images
+val: /Users/antonyjacob/Desktop/ChessSet/ChessSet Label.v4i.yolov5pytorch/valid/images
+test: /Users/antonyjacob/Desktop/ChessSet/ChessSet Label.v4i.yolov5pytorch/test/images
+
+nc: 12
+names: ['Black Knight', 'black bishop', 'black king', 'black pawn', 'black queen', 'black rook', 'white bishop', 'white king', 'white pawn', 'white queen', 'white rook', 'whiteknight']
+
+roboflow:
+  workspace: chessset-l1zu6
+  project: chessset-label
+  version: 4
+  license: CC BY 4.0
+  url: https://universe.roboflow.com/chessset-l1zu6/chessset-label/dataset/4
