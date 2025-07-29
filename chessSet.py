@@ -1,5 +1,5 @@
 """
-chessSet.py
+chessSet.py.
 
 Runs a chess piece detection pipeline using YOLOv5 to identify piece positions
 on a chessboard image. Converts detected positions into a legal FEN string,
@@ -53,6 +53,13 @@ URL = "https://stockfish.online/api/s/v2.php"
 
 
 def chessBoardDetect(raw_image_path: str, output_path: str):
+    """
+    Run YOLOv5 object detection on a window screenshot identifies the chessboard.
+
+    Returns:
+        results (torch.Tensor or pandas.DataFrame): Model detection results.
+        image (numpy.ndarray): The original input image as loaded by OpenCV.
+    """
     model = torch.hub.load('ultralytics/yolov5', 'custom', path='/Users/antonyjacob/Desktop/ChessSet/yolov5/runs/train/chessboard_id6/weights/best.pt',
      force_reload=True)
     results = model(raw_image_path)
@@ -78,12 +85,12 @@ def chessDetect(
     iou_thresh: float = 0.5
 ):
     """
-    Runs YOLOv5 object detection on a chessboard image.
+    Run YOLOv5 object detection on a chessboard image.
+
     Returns:
         results (torch.Tensor or pandas.DataFrame): Model detection results.
         image (numpy.ndarray): The original input image as loaded by OpenCV.
     """
-
     # Load YOLOv5 model
     model = torch.hub.load(
         repo_path, 'custom',
@@ -104,29 +111,34 @@ def chessDetect(
 
     return results, image
 
-
-def get_latest_label_file() -> str:
-    label_dirs = sorted(
-        glob.glob('runs/detect/exp*/labels'),
-        key=os.path.getmtime,
-        reverse=True
-    )
-
-    if not label_dirs:
-        raise FileNotFoundError("No label directories found.")
-    label_files = glob.glob(os.path.join(label_dirs[0], '*.txt'))
-    if not label_files:
-        raise FileNotFoundError("No label files found in latest directory.")
-
-    return label_files[0]
-
-
 def save_labels(results, label_path: str):
+    """
+    Save YOLOv5 detection results as a CSV file.
+
+    Converts the detection results from the YOLOv5 model into a pandas DataFrame
+    and saves it to the specified path in CSV format.
+    """
     df = results.pandas().xyxy[0]
     df.to_csv(label_path, index=False, header=True)
 
 
 def sortNLocate(label_csv_path, width, height) -> Dict[int, chess.Piece]:
+    """
+    Parse detection labels and maps them to chessboard positions.
+
+    Reads bounding box coordinates from a YOLOv5-generated label CSV,
+    calculates the center of each box, and converts it to a chess square
+    based on board dimensions. Returns a dictionary mapping each square
+    to its corresponding chess piece.
+
+    Args:
+        label_csv_path (str): Path to the label CSV file.
+        width (int): Width of the input image in pixels.
+        height (int): Height of the input image in pixels.
+
+    Returns:
+        Dict[int, chess.Piece]: Mapping from board index (0–63) to chess piece.
+    """
     df = pd.read_csv(label_csv_path)
     PieceNPlace = {}
 
@@ -155,6 +167,15 @@ def sortNLocate(label_csv_path, width, height) -> Dict[int, chess.Piece]:
 
 
 def flip_pos(pos):
+    """
+    Flip a square position across both axes of the chessboard.
+
+    Args:
+        pos (str): Square in algebraic notation (e.g., 'e2').
+
+    Returns:
+        str: Flipped square (e.g., 'd7').
+    """
     file, rank = pos[0], pos[1]
     if not 'a' <= file <= 'h' or not '1' <= rank <= '8':
         raise ValueError("Invalid file or rank")
