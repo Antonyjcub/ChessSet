@@ -52,6 +52,23 @@ label = 'labels.txt'
 URL = "https://stockfish.online/api/s/v2.php"
 
 
+def chessBoardDetect(raw_image_path: str, output_path: str):
+    model = torch.hub.load('ultralytics/yolov5', 'custom', path='/Users/antonyjacob/Desktop/ChessSet/yolov5/runs/train/chessboard_id6/weights/best.pt',
+     force_reload=True)
+    results = model(raw_image_path)
+    df = results.pandas().xyxy[0]
+    img = cv2.imread(raw_image_path)
+
+    if not df.empty:
+        top_box = df.sort_values('confidence', ascending=False).iloc[0]
+        xmin, ymin, xmax, ymax = map(int, [top_box['xmin'], top_box['ymin'], top_box['xmax'], top_box['ymax']])
+        cropped = img[ymin:ymax, xmin:xmax]
+        cv2.imwrite(output_path, cropped)
+        print(f"Cropped image saved to: {output_path}")
+    else:
+        raise ValueError("No chessboard detected.")
+    # new content above
+
 def chessDetect(
     image_path: str,
     model_path: str,
@@ -145,9 +162,14 @@ def flip_pos(pos):
     flipped_rank = chr(ord('1') + ord('8') - ord(rank))
     return flipped_file + flipped_rank
 
+chessBoardDetect(
+    raw_image_path="/Users/antonyjacob/Desktop/ChessSet/chess.png",
+    output_path="/Users/antonyjacob/Desktop/ChessSet/cropped_chessboard.jpg"
+)
+
 
 results, im = chessDetect(
-    image_path="/Users/antonyjacob/Desktop/ChessSet/chess.png",
+    image_path="/Users/antonyjacob/Desktop/ChessSet/cropped_chessboard.jpg",
     model_path=(
         "/Users/antonyjacob/Desktop/ChessSet/yolov5/"
         "runs/train/chess_detect4/weights/best.pt"
