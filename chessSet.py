@@ -185,7 +185,7 @@ def flip_pos(pos):
 
 chessBoardDetect(
     raw_image_path="../ChessSet/chess.png",
-    output_path="/Users/antonyjacob/Desktop/ChessSet/cropped_chessboard.jpg"
+    output_path="../ChessSet/cropped_chessboard.jpg"
 )
 
 
