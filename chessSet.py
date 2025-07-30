@@ -60,7 +60,7 @@ def chessBoardDetect(raw_image_path: str, output_path: str):
         results (torch.Tensor or pandas.DataFrame): Model detection results.
         image (numpy.ndarray): The original input image as loaded by OpenCV.
     """
-    model = torch.hub.load('ultralytics/yolov5', 'custom', path='/Users/antonyjacob/Desktop/ChessSet/yolov5/runs/train/chessboard_id6/weights/best.pt',
+    model = torch.hub.load('ultralytics/yolov5', 'custom', path='../ChessSet/yolov5/runs/train/chessboard_id6/weights/best.pt',
      force_reload=True)
     results = model(raw_image_path)
     df = results.pandas().xyxy[0]
@@ -184,18 +184,18 @@ def flip_pos(pos):
     return flipped_file + flipped_rank
 
 chessBoardDetect(
-    raw_image_path="/Users/antonyjacob/Desktop/ChessSet/chess.png",
+    raw_image_path="../ChessSet/chess.png",
     output_path="/Users/antonyjacob/Desktop/ChessSet/cropped_chessboard.jpg"
 )
 
 
 results, im = chessDetect(
-    image_path="/Users/antonyjacob/Desktop/ChessSet/cropped_chessboard.jpg",
+    image_path="../ChessSet/cropped_chessboard.jpg",
     model_path=(
-        "/Users/antonyjacob/Desktop/ChessSet/yolov5/"
+        "../ChessSet/yolov5/"
         "runs/train/chess_detect4/weights/best.pt"
     ),
-    repo_path="/Users/antonyjacob/Desktop/ChessSet/yolov5",
+    repo_path="../ChessSet/yolov5",
     label_output_path="label.txt"
 )
 """Display results
